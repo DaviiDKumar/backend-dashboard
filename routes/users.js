@@ -34,7 +34,7 @@ router.post("/", auth, adminOnly, async (req, res) => {
 
     const user = await User.create({
       email,
-      username: username.trim(),
+      username: username.trim().toLowerCase(),
       password: hashedPassword,
       role: "user",
     });
