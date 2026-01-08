@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 5000;
 
 // 1. DYNAMIC CORS CONFIGURATION
 const allowedOrigins = [
-  "https://frontend-dashboard-bay.vercel.app", 
+  "https://frontend-dashboard-omega-swart.vercel.app/", 
   "http://localhost:5173"
 ];
 
