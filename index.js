@@ -16,11 +16,11 @@ dotenv.config();
 connectDB();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;
 
 // 1. DYNAMIC CORS CONFIGURATION
 const allowedOrigins = [
-  "https://frontend-dashboard-omega-swart.vercel.app", 
+  "https://frontend-dashboard-delta-rouge.vercel.app", 
   "http://localhost:5173"
 ];
 
