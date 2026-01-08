@@ -22,34 +22,34 @@ router.post("/login", async (req, res) => {
     {
       id: user._id,
       role: user.role,
-      username: user.username, // ✅ include username
+      username: user.username,
     },
     process.env.JWT_SECRET,
     { expiresIn: "1d" }
   );
 
- res
-  .cookie("token", token, {
-    httpOnly: true,
-    // Must be true for Cross-Site cookies to work
-    secure: true, 
-    // "none" is required when Frontend and Backend are on different domains
-    sameSite: "none", 
-    maxAge: 24 * 60 * 60 * 1000,
-  })
-  .json({
-    role: user.role,
-    username: user.username,
-  });
+  res
+    .cookie("token", token, {
+      httpOnly: true,
+      secure: true,      // Required for HTTPS (Render)
+      sameSite: "none",  // Required for cross-domain (Vercel to Render)
+      maxAge: 24 * 60 * 60 * 1000,
+      path: "/",         // ✅ Added: Ensures cookie is valid for all pages
+    })
+    .json({
+      role: user.role,
+      username: user.username,
+    });
 });
 
 router.post("/logout", (req, res) => {
   res
     .cookie("token", "", {
       httpOnly: true,
-      expires: new Date(0), // Clears the cookie immediately
-      secure: true,      
-      sameSite: "none",     // MUST match the login route to be accepted
+      secure: true,      // Must match login
+      sameSite: "none",  // Must match login
+      expires: new Date(0),
+      path: "/",         // ✅ Added: Ensures deletion applies to the whole site
     })
     .json({ message: "Logged out successfully" });
 });
