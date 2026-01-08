@@ -28,30 +28,18 @@ router.post("/login", async (req, res) => {
     { expiresIn: "1d" }
   );
 
-  res
-    .cookie("token", token, {
-      httpOnly: true,
-      secure: true,      // Required for HTTPS (Render)
-      sameSite: "none",  // Required for cross-domain (Vercel to Render)
-      maxAge: 24 * 60 * 60 * 1000,
-      path: "/",         // ✅ Added: Ensures cookie is valid for all pages
-    })
-    .json({
-      role: user.role,
-      username: user.username,
-    });
+  // ✅ NO COOKIES: Send token in the JSON body
+  // This is the "Bearer Token" method that works on Safari
+  res.json({
+    token, 
+    role: user.role,
+    username: user.username,
+  });
 });
 
+// Logout is now handled mostly on the frontend by clearing localStorage
 router.post("/logout", (req, res) => {
-  res
-    .cookie("token", "", {
-      httpOnly: true,
-      secure: true,      // Must match login
-      sameSite: "none",  // Must match login
-      expires: new Date(0),
-      path: "/",         // ✅ Added: Ensures deletion applies to the whole site
-    })
-    .json({ message: "Logged out successfully" });
+  res.json({ message: "Logout successful. Please clear token from client storage." });
 });
 
 export default router;
