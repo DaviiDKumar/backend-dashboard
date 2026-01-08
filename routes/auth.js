@@ -47,9 +47,9 @@ router.post("/logout", (req, res) => {
   res
     .cookie("token", "", {
       httpOnly: true,
-      expires: new Date(0),
-      sameSite: "strict",
-      secure: true,
+      expires: new Date(0), // Clears the cookie immediately
+      secure: true,      
+      sameSite: "none",     // MUST match the login route to be accepted
     })
     .json({ message: "Logged out successfully" });
 });
