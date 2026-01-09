@@ -115,4 +115,28 @@ router.get("/download/:id", auth, async (req, res) => {
   }
 });
 
+/* ================= VIEW LEADS ONLINE (USER) ================= */
+router.get("/view/:id", auth, async (req, res) => {
+  try {
+    const file = await File.findById(req.params.id);
+    
+    // Security: Ensure the file exists and belongs to the user
+    if (!file || !file.assignedTo.includes(req.user.id)) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const leads = await Lead.find({
+      assignedTo: req.user.id,
+      fileId: file._id,
+    }).select("data createdAt"); // Only send the lead data and date
+
+    res.json({ 
+      fileName: file.fileName,
+      leads: leads.map(l => ({ ...l.data, _id: l._id })) 
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Error loading leads" });
+  }
+});
+
 export default router;

@@ -121,4 +121,37 @@ router.delete("/:id", auth, adminOnly, async (req, res) => {
   }
 });
 
+/**
+ * Admin: Change a specific user's password
+ */
+router.patch("/change-password/:id", auth, adminOnly, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { newPassword } = req.body;
+
+    // 1. Validation
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ 
+        message: "New password is required and must be at least 6 characters long" 
+      });
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // 2. Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // 3. Update in Database
+    await User.findByIdAndUpdate(id, { password: hashedPassword });
+
+    res.json({ message: `Password for ${user.username} updated successfully` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error during password reset" });
+  }
+});
+
 export default router;

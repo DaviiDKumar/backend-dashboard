@@ -9,6 +9,9 @@ import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
 import fileRoutes from "./routes/files.js";
 import authCheckRoutes from "./routes/authCheck.js";
+import reassignRoutes from "./routes/reassign.js";
+
+
 
 dotenv.config();
 
@@ -16,30 +19,21 @@ dotenv.config();
 connectDB();
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+
+// Use the port from .env (Render provides this) or default to 5000 for local
+const PORT = process.env.PORT || 5000; 
 
 // 1. DYNAMIC CORS CONFIGURATION
-const allowedOrigins = [
-  "https://frontend-dashboard-delta-rouge.vercel.app", 
-  "http://localhost:5173"
-];
+// backend/index.js
 
+// backend/index.js
+
+// Replace your current app.use(cors(...)) with this:
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or Postman)
-    if (!origin) return callback(null, true);
-
-    // Allow list check + Vercel preview wildcard check
-    if (allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
-      callback(null, true);
-    } else {
-      console.log("Blocked by CORS:", origin);
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true, // Keep this true so it doesn't break existing dev environments
+  origin: true, // This allows ANY origin that is making the request
+  credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"] // ✅ CRITICAL: Allows the Bearer Token
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 // 2. MIDDLEWARE
@@ -51,6 +45,7 @@ app.get("/", (req, res) => {
   res.json({ 
     message: "DATATECH API is running smoothly", 
     system: "Bearer Token Auth Active",
+    port: PORT,
     status: "online" 
   });
 });
@@ -60,6 +55,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/auth", authCheckRoutes); 
 app.use("/api/users", userRoutes);
 app.use("/api/files", fileRoutes);
+app.use("/api/reassign", reassignRoutes);
 
 // 5. ERROR HANDLING
 app.use((req, res) => {
