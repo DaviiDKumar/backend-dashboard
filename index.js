@@ -30,13 +30,18 @@ const PORT = process.env.PORT || 5000;
 
 // Replace your current app.use(cors(...)) with this:
 // backend/index.js
+// backend/index.js
+
 app.use(cors({
-  origin: ["http://localhost:5173", "http://127.0.0.1:5173"], 
+  origin: [
+    "http://localhost:5173", 
+    "http://127.0.0.1:5173",
+    "https://frontend-dashboard-delta-rouge.vercel.app" // ✅ Your Vercel Frontend
+  ], 
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"], // Added PATCH
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
-
 // 2. MIDDLEWARE
 app.use(cookieParser()); 
 app.use(express.json());
