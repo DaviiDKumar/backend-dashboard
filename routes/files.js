@@ -116,11 +116,10 @@ router.get("/download/:id", auth, async (req, res) => {
 });
 
 /* ================= VIEW LEADS ONLINE (USER) ================= */
+//* ================= VIEW LEADS ONLINE (CORE 4 ONLY) ================= */
 router.get("/view/:id", auth, async (req, res) => {
   try {
     const file = await File.findById(req.params.id);
-    
-    // Security: Ensure the file exists and belongs to the user
     if (!file || !file.assignedTo.includes(req.user.id)) {
       return res.status(403).json({ message: "Access denied" });
     }
@@ -128,14 +127,34 @@ router.get("/view/:id", auth, async (req, res) => {
     const leads = await Lead.find({
       assignedTo: req.user.id,
       fileId: file._id,
-    }).select("data createdAt"); // Only send the lead data and date
+    });
+
+    // We only extract the Core 4 from the raw data object
+    const filteredLeads = leads.map(lead => ({
+      _id: lead._id,
+      full_name: lead.data["full name"] || lead.data["full_name"] || "N/A",
+      email: lead.data["email"] || "N/A",
+      phone_number: lead.data["phone number"] || lead.data["phone_number"] || "N/A",
+      city: lead.data["city"] || "N/A",
+    }));
 
     res.json({ 
       fileName: file.fileName,
-      leads: leads.map(l => ({ ...l.data, _id: l._id })) 
+      leads: filteredLeads 
     });
   } catch (err) {
-    res.status(500).json({ message: "Error loading leads" });
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+/* ================= LIST ALL FILES (ADMIN ONLY) ================= */
+router.get("/admin/all", auth, adminOnly, async (req, res) => {
+  try {
+    const files = await File.find().sort({ createdAt: -1 });
+    res.json(files);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching all files" });
   }
 });
 

@@ -124,33 +124,41 @@ router.delete("/:id", auth, adminOnly, async (req, res) => {
 /**
  * Admin: Change a specific user's password
  */
-router.patch("/change-password/:id", auth, adminOnly, async (req, res) => {
+/* ================= RESET PASSWORD (ADMIN ONLY) ================= */
+router.post("/reset-password", auth, adminOnly, async (req, res) => {
   try {
-    const { id } = req.params;
-    const { newPassword } = req.body;
+    const { userId, newPassword } = req.body;
 
     // 1. Validation
-    if (!newPassword || newPassword.length < 6) {
+    if (!userId || !newPassword || newPassword.length < 6) {
       return res.status(400).json({ 
-        message: "New password is required and must be at least 6 characters long" 
+        message: "User ID and a password of at least 6 characters are required." 
       });
     }
 
-    const user = await User.findById(id);
+    // 2. Manual Hash
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // 3. Direct Update (This bypasses the .pre('save') hook)
+    const user = await User.findOneAndUpdate(
+      { _id: userId }, 
+      { password: hashedPassword },
+      { new: true }
+    );
+
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "Agent node not found." });
     }
 
-    // 2. Hash the new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    res.json({ 
+      success: true, 
+      message: `Access keys for ${user.username} have been rotated.` 
+    });
 
-    // 3. Update in Database
-    await User.findByIdAndUpdate(id, { password: hashedPassword });
-
-    res.json({ message: `Password for ${user.username} updated successfully` });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error during password reset" });
+    console.error("Auth System Error:", err);
+    res.status(500).json({ message: "Internal Security Breach / Server Error" });
   }
 });
 
