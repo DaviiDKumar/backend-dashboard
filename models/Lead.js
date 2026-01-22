@@ -3,29 +3,16 @@ import mongoose from "mongoose";
 const leadSchema = new mongoose.Schema(
   {
     data: { type: Object, required: true },
-
-    assignedTo: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+    assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    fileId: { type: mongoose.Schema.Types.ObjectId, ref: "File", required: true },
+    // ADD THIS NEW FIELD
+    status: { 
+      type: String, 
+      enum: ["pending", "done", "rejected", "none"], 
+      default: "none" 
     },
-
-    uploadedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-
-    fileId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "File",
-      required: true,
-    },
-
-    assignedAt: {
-      type: Date,
-      default: Date.now,
-    },
+    assignedAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );
