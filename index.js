@@ -10,7 +10,7 @@ import userRoutes from "./routes/users.js";
 import fileRoutes from "./routes/files.js";
 import authCheckRoutes from "./routes/authCheck.js";
 import reassignRoutes from "./routes/reassign.js";
-
+import archiveRoutes from "./routes/archive.js"; // IMPORT THE NEW FILE HERE
 
 
 dotenv.config();
@@ -62,7 +62,7 @@ app.use("/api/auth", authCheckRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/files", fileRoutes);
 app.use("/api/reassign", reassignRoutes);
-
+app.use("/api/archive", archiveRoutes); // REGISTER THE NEW ARCHIVE ROUTE HERE
 
 
 // 5. ERROR HANDLING

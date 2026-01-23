@@ -6,10 +6,10 @@ const leadSchema = new mongoose.Schema(
     assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     fileId: { type: mongoose.Schema.Types.ObjectId, ref: "File", required: true },
-    // ADD THIS NEW FIELD
     status: { 
       type: String, 
-      enum: ["pending", "done", "rejected", "none"], 
+      // FIX: Added "flushed" to the allowed list below
+      enum: ["pending", "done", "rejected", "none", "flushed"], 
       default: "none" 
     },
     assignedAt: { type: Date, default: Date.now },
